@@ -3,53 +3,87 @@ import google.generativeai as genai
 import re
 
 # Cấu hình trang
-st.set_page_config(page_title="Gemini 3.1 Auto-Recap", page_icon="⚡")
+st.set_page_config(page_title="AI Movie Recap Pro", page_icon="🔥", layout="wide")
 
 # --- LẤY API KEY TỪ SECRETS ---
 if "GEMINI_API_KEY" in st.secrets:
     api_key = st.secrets["GEMINI_API_KEY"]
 else:
-    st.error("❌ Không tìm thấy API Key trong Secrets. Vui lòng cấu hình trên Streamlit Cloud!")
+    st.error("❌ Không tìm thấy API Key trong Secrets. Hãy thêm 'GEMINI_API_KEY' vào phần Settings -> Secrets trên Streamlit Cloud.")
     st.stop()
 
 def clean_srt(srt_content):
-    """Xử lý file SRT: Bỏ số thứ tự và mốc thời gian"""
+    """Lọc bỏ rác trong file SRT để AI tập trung vào lời thoại"""
     text = re.sub(r'\d+\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}', '', srt_content)
     text = re.sub(r'^\d+\s*$', '', text, flags=re.MULTILINE)
     return " ".join(text.split())
 
 def generate_content(content):
-    """Sử dụng Gemini 3.1 Flash Lite Preview"""
+    """Gọi Gemini 3.1 Flash Lite với cấu trúc phản hồi chi tiết"""
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-3.1-flash-lite-preview")
         
+        # Prompt được thiết kế lại để phân cấp nội dung rõ ràng
         prompt = f"""
-        Bạn là một chuyên gia Review Phim. Dựa vào nội dung file SRT sau:
+        Bạn là một biên tập viên chuyên tóm tắt phim tu tiên, kiếm hiệp và fantasy cho YouTube.
+        Dưới đây là kịch bản (phụ đề) của phim:
         ---
         {content}
         ---
-        Hãy trích xuất và viết nội dung sau bằng tiếng Việt:
-        1. Tên nhân vật chính:
-        2. Hệ thống cảnh giới/sức mạnh (nếu có):
-        3. Tiêu đề YouTube (3 mẫu):
-        4. Mô tả phim kịch tính (để đăng YouTube):
-        5. Hashtag:
+        Dựa trên kịch bản trên, hãy trình bày nội dung theo đúng cấu trúc sau:
+
+        1. **TIÊU ĐỀ VIDEO (3 Lựa chọn)**:
+           - Đưa lên đầu tiên. Tiêu đề cần kịch tính, chuẩn SEO, chứa từ khóa mạnh (Ví dụ: Trùm cuối, Nghịch thiên, Cảnh giới cao nhất...).
+
+        2. **NHÂN VẬT CHÍNH**:
+           - Tên nhân vật, biệt danh, vũ khí hoặc linh thú đi kèm (nếu có).
+
+        3. **CHI TIẾT HỆ THỐNG CẢNH GIỚI & SỨC MẠNH**:
+           - Phân tích kỹ các cấp bậc sức mạnh xuất hiện hoặc được nhắc đến.
+           - Trình bày dạng danh sách có thứ tự từ thấp đến cao (ví dụ: Luyện Khí -> Trúc Cơ -> ...).
+           - Ghi chú thêm đặc điểm của mỗi cấp độ nếu kịch bản có nhắc tới.
+
+        4. **MÔ TẢ YOUTUBE (DESCRIPTION)**:
+           - Viết một đoạn tóm tắt nội dung kịch tính (200-300 từ) để lôi kéo người xem bấm vào video.
+
+        5. **HASHTAG XU HƯỚNG**:
+           - Danh sách các hashtag liên quan.
+
+        Yêu cầu: Văn phong chuyên nghiệp, dùng thuật ngữ phim ảnh chính xác. Nếu không thấy tên nhân vật hoặc cảnh giới rõ ràng, hãy dựa vào ngữ cảnh để suy luận thông minh.
         """
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
         return f"Lỗi: {str(e)}"
 
-# --- GIAO DIỆN ---
-st.title("🎬 AI Movie Recap (Auto-Key)")
-uploaded_file = st.file_uploader("Tải file SRT lên", type=["srt"])
+# --- GIAO DIỆN NGƯỜI DÙNG ---
+st.title("⚡ AI Movie Content Creator")
+st.markdown("Hệ thống tự động phân tích cảnh giới và viết mô tả YouTube bằng **Gemini 3.1 Flash Lite**.")
+
+uploaded_file = st.file_uploader("Tải lên file phụ đề (.srt)", type=["srt"])
 
 if uploaded_file:
-    if st.button("🚀 Chạy phân tích ngay"):
-        with st.spinner("Đang xử lý..."):
-            content = uploaded_file.getvalue().decode("utf-8")
-            cleaned_text = clean_srt(content)
+    # Hiển thị nút bấm
+    if st.button("🚀 Bắt đầu phân tích kịch bản"):
+        with st.spinner("Gemini đang quét hệ thống cảnh giới..."):
+            # Xử lý text
+            raw_text = uploaded_file.getvalue().decode("utf-8")
+            cleaned_text = clean_srt(raw_text)
+            
+            # Gọi AI
             result = generate_content(cleaned_text)
-            st.markdown("### ✨ Kết quả:")
-            st.write(result)
+            
+            # Hiển thị kết quả
+            st.divider()
+            st.markdown(result)
+            
+            # Nút tải kết quả
+            st.download_button(
+                label="📥 Tải về bản nháp mô tả",
+                data=result,
+                file_name="mo_ta_phim.md",
+                mime="text/markdown"
+            )
+
+st.sidebar.info("Lưu ý: API Key đã được cấu hình bảo mật trong hệ thống.")
