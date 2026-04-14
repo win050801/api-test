@@ -18,13 +18,13 @@ def clean_srt(srt_content):
     text = re.sub(r'^\d+\s*$', '', text, flags=re.MULTILINE)
     return " ".join(text.split())
 
-def generate_content(content):
-    """Gọi Gemini 3.1 Flash Lite với cấu trúc phản hồi chi tiết"""
+def generate_content(content, model_name):
+    """Gọi Gemini với model được chọn và cấu trúc phản hồi chi tiết"""
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-3.1-flash-lite-preview")
+        # Sử dụng model được truyền vào từ giao diện
+        model = genai.GenerativeModel(model_name)
         
-        # Prompt được thiết kế lại để phân cấp nội dung rõ ràng
         prompt = f"""
         Bạn là một biên tập viên chuyên tóm tắt phim tu tiên, kiếm hiệp và fantasy cho YouTube.
         Dưới đây là kịch bản (phụ đề) của phim:
@@ -59,20 +59,34 @@ def generate_content(content):
 
 # --- GIAO DIỆN NGƯỜI DÙNG ---
 st.title("⚡ AI Movie Content Creator")
-st.markdown("Hệ thống tự động phân tích cảnh giới và viết mô tả YouTube bằng **Gemini 3.1 Flash Lite**.")
+st.markdown("Hệ thống tự động phân tích cảnh giới và viết mô tả YouTube.")
+
+# --- SIDEBAR: CHỌN MODEL ---
+with st.sidebar:
+    st.header("Cấu hình Model")
+    selected_model = st.selectbox(
+        "Chọn phiên bản Gemini:",
+        [
+            "gemini-3-flash-preview", 
+            "gemini-3.1-flash-lite-preview"
+        ],
+        help="Bản 3.1 Flash Lite thường nhanh và tiết kiệm hơn, bản 3 Flash mạnh mẽ hơn trong việc suy luận."
+    )
+    st.divider()
+    st.info("Lưu ý: API Key đã được cấu hình bảo mật trong hệ thống.")
 
 uploaded_file = st.file_uploader("Tải lên file phụ đề (.srt)", type=["srt"])
 
 if uploaded_file:
     # Hiển thị nút bấm
     if st.button("🚀 Bắt đầu phân tích kịch bản"):
-        with st.spinner("Gemini đang quét hệ thống cảnh giới..."):
+        with st.spinner(f"Đang sử dụng {selected_model} để quét kịch bản..."):
             # Xử lý text
             raw_text = uploaded_file.getvalue().decode("utf-8")
             cleaned_text = clean_srt(raw_text)
             
-            # Gọi AI
-            result = generate_content(cleaned_text)
+            # Gọi AI với model đã chọn
+            result = generate_content(cleaned_text, selected_model)
             
             # Hiển thị kết quả
             st.divider()
@@ -85,5 +99,3 @@ if uploaded_file:
                 file_name="mo_ta_phim.md",
                 mime="text/markdown"
             )
-
-st.sidebar.info("Lưu ý: API Key đã được cấu hình bảo mật trong hệ thống.")
