@@ -67,8 +67,9 @@ with st.sidebar:
     selected_model = st.selectbox(
         "Chọn phiên bản Gemini:",
         [
-            "gemini-3-flash-preview", 
-            "gemini-3.1-flash-lite-preview"
+            "gemini-2.5-flash-lite",
+            "gemini-3-flash-preview" 
+            
         ],
         help="Bản 3.1 Flash Lite thường nhanh và tiết kiệm hơn, bản 3 Flash mạnh mẽ hơn trong việc suy luận."
     )
