@@ -31,7 +31,7 @@ def generate_content(content, model_name):
         ---
         {content}
         ---
-        Dựa trên kịch bản trên, hãy trình bày nội dung theo đúng cấu trúc sau thêm vào những từ ngữ seb tìm kiểm để tăng khả năng tiếp cận người xem:
+        Dựa trên kịch bản trên, hãy trình bày nội dung bằng tiếng Việt theo đúng cấu trúc sau thêm vào những từ ngữ SEO tìm kiểm để tăng khả năng tiếp cận người xem:
 
         1. **TIÊU ĐỀ VIDEO (3 Lựa chọn)**:
            - Đưa lên đầu tiên. Tiêu đề cần kịch tính, chuẩn SEO, chứa từ khóa mạnh dễ tìm kiếm.
