@@ -26,7 +26,7 @@ def generate_content(content, model_name):
         model = genai.GenerativeModel(model_name)
         
         prompt = f"""
-        Bạn là một biên tập viên chuyên tóm tắt phim tu tiên, kiếm hiệp và fantasy cho YouTube.
+        Bạn là một biên tập viên chuyên tóm tắt phim tu tiên, kiếm hiệp và fantasy cho YouTube mới nhất năm 2026.
         Dưới đây là kịch bản (phụ đề) của phim:
         ---
         {content}
