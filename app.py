@@ -31,10 +31,10 @@ def generate_content(content, model_name):
         ---
         {content}
         ---
-        Dựa trên kịch bản trên, hãy trình bày nội dung theo đúng cấu trúc sau:
+        Dựa trên kịch bản trên, hãy trình bày nội dung theo đúng cấu trúc sau thêm vào những từ ngữ seb tìm kiểm để tăng khả năng tiếp cận người xem:
 
         1. **TIÊU ĐỀ VIDEO (3 Lựa chọn)**:
-           - Đưa lên đầu tiên. Tiêu đề cần kịch tính, chuẩn SEO, chứa từ khóa mạnh (Ví dụ: Trùm cuối, Nghịch thiên, Cảnh giới cao nhất...).
+           - Đưa lên đầu tiên. Tiêu đề cần kịch tính, chuẩn SEO, chứa từ khóa mạnh dễ tìm kiếm.
 
         2. **NHÂN VẬT CHÍNH**:
            - Tên nhân vật, biệt danh, vũ khí hoặc linh thú đi kèm (nếu có).
